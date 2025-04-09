@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>工厂指标雷达图（最终修正版）</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div id="main" style="width: 100%; height: 80vh; min-height: 400px;"></div>
+
+    <script>
+        const factoryConfig = {
+            factories: ['理想', '赛力斯', '比亚迪', '小鹏', '小米一期', '小米二期A', '小米二期B'],
+            dimensions: [
+                { 
+                    name: '实施范围(↑)',  
+                    data: [5,5,5,6,6,6,6],
+                    min: 0,
+                    max: 10,
+                    positive: true
+                },
+                { 
+                    name: '实施周期(月)(↓)', 
+                    data: [15,14,8,10,18,8,10],
+                    min: 0,
+                    max: 20,
+                    positive: false
+                },
+                { 
+                    name: '实施成本(万)(↓)', 
+                    data: [1961,3630,1500,1420,1475,1261,1141],
+                    min: 0,
+                    max: 4000,
+                    positive: false
+                },
+                { 
+                    name: '单JPH成本(万)(↓)', 
+                    data: [49,60.5,25,35.5,36.9,33.2,28.5],
+                    min: 0,
+                    max: 100,
+                    positive: false
+                },
+                { 
+                    name: '实施人员(名)(↓)', 
+                    data: [18,21,25,12,12,28,16],
+                    min: 0,
+                    max: 30,
+                    positive: false
+                },
+                { 
+                    name: '运维人员(名)(↓)', 
+                    data: [4,3,2,4,2,2,2],
+                    min: 0,
+                    max: 5,
+                    positive: false
+                }
+            ],
+            colors: ['#5470C6','#91CC75','#FAC858','#EE6666','#73C0DE','#3BA272','#FC8452']
+        };
+
+        function normalize(dimension, value) {
+            const { min, max, positive } = dimension;
+            if (min === max) return 50;
+            return positive 
+                ? ((value - min) / (max - min) * 100).toFixed(1)
+                : ((max - (value - min)) / (max - min) * 100).toFixed(1);
+        }
+
+        window.onload = function() {
+            const seriesData = factoryConfig.factories.map((factory, index) => ({
+                name: factory,
+                value: factoryConfig.dimensions.map(dim => 
+                    Number(normalize(dim, dim.data[index]))
+                ),
+                rawData: factoryConfig.dimensions.map(dim => dim.data[index])
+            }));
+
+            const option = {
+                title: { 
+                    text: '工厂多维指标分析（↑越大越好 ↓越小越好）',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 16,
+                        color: '#333'
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: params => {
+                        const dataIndex = params.dataIndex;
+                        const factoryData = seriesData[dataIndex];
+                        return `<div style="max-width:300px">
+                            <strong style="color:${factoryConfig.colors[dataIndex]}">${factoryData.name}</strong>
+                            ${factoryConfig.dimensions.map((dim, i) => `
+                                <div style="margin:5px 0;color:#666">
+                                    ${dim.name}: 
+                                    <span style="float:right;">
+                                        ${factoryData.rawData[i]} 
+                                        <span style="color:#999">(${factoryData.value[i]}%)</span>
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>`;
+                    }
+                },
+                legend: {
+                    data: factoryConfig.factories,
+                    bottom: 20,
+                    textStyle: {
+                        color: '#666',
+                        fontSize: 12
+                    }
+                },
+                radar: {
+                    name: {
+                        textStyle: {
+                            color: '#000', // 维度名称颜色[6,7](@ref)
+                            fontSize: 13
+                        }
+                    },
+                    indicator: factoryConfig.dimensions.map(dim => ({ 
+                        name: dim.name, 
+                        max: 100,
+                        axisLabel: {
+                            color: '#000',
+                            formatter: (value, indicator) => {
+                                const unit = indicator.name.includes('成本') ? '万' : '';
+                                return `{name|${indicator.name}}\n{value|${dim.min}-${dim.max}${unit}}`;
+                            },
+                            rich: {
+                                name: { 
+                                    fontSize: 13, 
+                                    color: '#000' 
+                                },
+                                value: { 
+                                    fontSize: 11, 
+                                    color: '#666'
+                                }
+                            }
+                        }
+                    })),
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(0,0,0,0.2)' // 轴线颜色优化[6](@ref)
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(0,0,0,0.1)' // 网格线颜色[7](@ref)
+                        }
+                    }
+                },
+                series: [{
+                    type: 'radar',
+                    color: factoryConfig.colors, // 系列颜色绑定[8](@ref)
+                    data: seriesData,
+                    lineStyle: {
+                        width: 2,
+                        opacity: 1
+                    },
+                    itemStyle: {
+                        borderWidth: 2
+                    },
+                    emphasis: {
+                        lineStyle: {
+                            width: 3
+                        }
+                    }
+                }]
+            };
+
+            const chart = echarts.init(document.getElementById('main'));
+            chart.setOption(option);
+        }
+    </script>
+</body>
+</html>
