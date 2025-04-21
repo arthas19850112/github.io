@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>工厂中控系统指标雷达图（7工厂对标）</title>
+    <title>工厂中控系统指标雷达图（8工厂对标）</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
 <body>
@@ -9,52 +9,45 @@
 
     <script>
         const factoryConfig = {
-            factories: ['理想', '赛力斯三厂', '比亚迪', '小鹏', '小米一期', '小米二期A', '小米二期B'],
+            factories: ['理想', '赛力斯三厂', '蔚来F2', '小鹏', '小米一期', '小米二期A', '小米二期B', '特斯拉'],
             dimensions: [
                 { 
                     name: '实施范围(↑)',  
-                    data: [5,5,5,6,6,6,6],
+                    data: [5,5,5,6,6,6,6,5],
                     min: 0,
                     max: 10,
                     positive: true
                 },
                 { 
                     name: '实施周期(月)(↓)', 
-                    data: [15,14,8,10,18,8,10],
+                    data: [15,14,15,10,18,8,10,11],
                     min: 0,
                     max: 20,
                     positive: false
                 },
                 { 
                     name: '实施成本(万)(↓)', 
-                    data: [2340,3630,1500,1420,1475,1256,1141],
+                    data: [2340,3630,3575,1420,1475,1256,1141,3400],
                     min: 0,
                     max: 4000,
                     positive: false
                 },
                 { 
                     name: '单JPH成本(万)(↓)', 
-                    data: [49,60.5,25,35.5,36.9,33,28.5],
+                    data: [58.5,60.5,59.6,35.5,36.9,33,28.5,34],
                     min: 0,
                     max: 100,
                     positive: false
                 },
-                /*{ 
-                    name: '实施人员(名)(↓)', 
-                    data: [18,21,25,12,12,28,16],
-                    min: 0,
-                    max: 30,
-                    positive: false
-                },*/
                 { 
                     name: '运维人员(名)(↓)', 
-                    data: [4,3,2,4,2,2,2],
+                    data: [4,3,4,4,2,2,2,5],
                     min: 0,
-                    max: 5,
+                    max: 10,  // 原max=5调整为10以适应新数据
                     positive: false
                 }
             ],
-            colors: ['#5470C6','#91CC75','#FAC858','#EE6666','#73C0DE','#3BA272','#FC8452']
+            colors: ['#5470C6','#91CC75','#FAC858','#EE6666','#73C0DE','#3BA272','#FC8452','#B399D4']
         };
 
         function normalize(dimension, value) {
@@ -113,7 +106,7 @@
                 radar: {
                     name: {
                         textStyle: {
-                            color: '#000', // 维度名称颜色[6,7](@ref)
+                            color: '#000',
                             fontSize: 13
                         }
                     },
@@ -140,18 +133,18 @@
                     })),
                     axisLine: {
                         lineStyle: {
-                            color: 'rgba(0,0,0,0.2)' // 轴线颜色优化[6](@ref)
+                            color: 'rgba(0,0,0,0.2)'
                         }
                     },
                     splitLine: {
                         lineStyle: {
-                            color: 'rgba(0,0,0,0.1)' // 网格线颜色[7](@ref)
+                            color: 'rgba(0,0,0,0.1)'
                         }
                     }
                 },
                 series: [{
                     type: 'radar',
-                    color: factoryConfig.colors, // 系列颜色绑定[8](@ref)
+                    color: factoryConfig.colors,
                     data: seriesData,
                     lineStyle: {
                         width: 2,
